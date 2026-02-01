@@ -28,27 +28,15 @@ const parseRelativeDate = (dateStr: string) => {
 };
 
 const renderCommunityDescription = (runs: any[], media: any[]) => {
-    let html = '';
+    let text = '';
     if (runs && runs.length) {
         runs.forEach((run: any) => {
-            const url = run?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url;
-            if (url) {
-                const fullUrl = url.startsWith('https://') ? url : `https://www.youtube.com${url}`;
-                html += `<a href="${fullUrl}">${run.text}</a>`;
-            } else {
-                html += (run?.text ?? '').replace(/\n/g, '<br>');
-            }
+            text += (run?.text ?? '');
         });
     }
-    if (media && media.length) {
-        html += '<br>';
-        media.forEach((item: any) => {
-            if (item?.url) {
-                html += `<img src="${item.url}" />`;
-            }
-        });
-    }
-    return html;
+    // Optional: Add media links or indicators if desired, but user asked for "clean text"
+    // matching the example which had no tags.
+    return text;
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
