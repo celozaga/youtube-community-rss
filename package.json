@@ -1,0 +1,22 @@
+{
+  "name": "simple-youtube-rss",
+  "version": "1.0.0",
+  "description": "Simplified YouTube Community RSS generator",
+  "main": "api/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "dayjs": "^1.11.10",
+    "rss": "^1.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.19",
+    "@types/rss": "^0.0.32",
+    "@vercel/node": "^3.0.22",
+    "typescript": "^5.3.3",
+    "vercel": "^33.5.1"
+  }
+}
