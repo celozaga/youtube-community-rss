@@ -165,22 +165,48 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             })
             .filter((item: any) => item !== null);
 
-        const feed = new RSS({
-            title: `${username} - Community Posts`,
-            description: description,
-            feed_url: `https://${req.headers.host}${req.url}`,
-            site_url: channelUrl,
-            language: 'en',
-            pubDate: new Date(),
-        });
+        const escapeXml = (unsafe: string) => {
+            return unsafe.replace(/[<>&'"]/g, (c) => {
+                switch (c) {
+                    case '<': return '&lt;';
+                    case '>': return '&gt;';
+                    case '&': return '&amp;';
+                    case '\'': return '&apos;';
+                    case '"': return '&quot;';
+                }
+                return c;
+            });
+        };
+
+        let rssXml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+    <title>${escapeXml(username + ' - Community Posts')}</title>
+    <description>${escapeXml(description)}</description>
+    <link>${channelUrl}</link>
+    <generator>RSS for Node</generator>
+    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+    <atom:link href="https://${req.headers.host}${req.url}" rel="self" type="application/rss+xml"/>
+`;
 
         items.forEach((item: any) => {
-            feed.item(item);
+            rssXml += `    <item>
+        <title>${escapeXml(item.title)}</title>
+        <description>${escapeXml(item.description)}</description>
+        <link>${item.url}</link>
+        <guid isPermaLink="false">${item.guid}</guid>
+        <dc:creator>${escapeXml(item.author)}</dc:creator>
+        <pubDate>${item.date.toUTCString()}</pubDate>
+    </item>
+`;
         });
+
+        rssXml += `</channel>
+</rss>`;
 
         res.setHeader('Content-Type', 'text/xml');
         res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=30');
-        res.status(200).send(feed.xml({ indent: true }));
+        res.status(200).send(rssXml);
 
     } catch (error: any) {
         console.error(error);
