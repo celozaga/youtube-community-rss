@@ -63,7 +63,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         urlPath = `channel/${handle}`;
     }
 
-    const targetUrl = `https://www.youtube.com/${urlPath}/community`;
+    const targetUrl = `https://www.youtube.com/${urlPath}/posts`;
 
     try {
         const response = await fetch(targetUrl, {
