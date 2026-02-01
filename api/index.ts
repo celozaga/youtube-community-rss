@@ -97,21 +97,41 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const ytInitialData = JSON.parse(match[1]);
 
         // Navigate safely to the content
-        const channelMetadata = ytInitialData.metadata?.channelMetadataRenderer;
+        // Navigate safely to the content
+        let username, channelUrl, description;
+        const microformat = ytInitialData.microformat?.microformatDataRenderer;
 
-        if (!channelMetadata) {
+        if (microformat) {
+            username = microformat.title;
+            channelUrl = microformat.urlCanonical || `https://www.youtube.com/${urlPath}`;
+            description = microformat.description;
+        } else {
+            const channelMetadata = ytInitialData.metadata?.channelMetadataRenderer;
+            if (channelMetadata) {
+                username = channelMetadata.title;
+                channelUrl = channelMetadata.channelUrl;
+                description = channelMetadata.description;
+            }
+        }
+
+        if (!username) {
             throw new Error('Could not find channel metadata. Is the handle correct?');
         }
 
-        const username = channelMetadata.title;
-        const channelUrl = channelMetadata.channelUrl;
-        const description = channelMetadata.description;
-
         const tabs = ytInitialData.contents?.twoColumnBrowseResultsRenderer?.tabs;
-        const communityTab = tabs?.find(
+        let communityTab = tabs?.find(
             (tab: any) => tab.tabRenderer?.endpoint?.commandMetadata?.webCommandMetadata?.url?.endsWith('/community') ||
                 tab.tabRenderer?.endpoint?.commandMetadata?.webCommandMetadata?.url?.endsWith('/posts')
         );
+
+        // Fallback: Check if the first tab has content if we couldn't find it by URL
+        if (!communityTab && tabs && tabs.length > 0) {
+            const firstTabContent = tabs[0].tabRenderer?.content?.sectionListRenderer?.contents?.[0]?.itemSectionRenderer?.contents;
+            // Check if it looks like a community tab (has backstage posts)
+            if (firstTabContent && firstTabContent.some((i: any) => i.backstagePostThreadRenderer)) {
+                communityTab = tabs[0];
+            }
+        }
 
         if (!communityTab) {
             throw new Error('Community tab not found. Does this channel have a community tab?');
