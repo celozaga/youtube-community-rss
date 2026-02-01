@@ -2,9 +2,8 @@
   "name": "simple-youtube-rss",
   "version": "1.0.0",
   "description": "Simplified YouTube Community RSS generator",
-  "main": "api/index.js",
+  "main": "api/index.ts",
   "scripts": {
-    "build": "tsc",
     "dev": "vercel dev"
   },
   "dependencies": {
