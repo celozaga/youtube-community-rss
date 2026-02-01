@@ -1,4 +1,4 @@
-# Simple YouTube Community RSS
+# YouTube Community RSS
 
 A simplified RSS generator for YouTube Community posts, designed to be hosted on Vercel.
 
