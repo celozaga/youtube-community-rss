@@ -1,6 +1,9 @@
 # YouTube Community RSS
 
-A simplified RSS generator for YouTube Community posts, designed to be hosted on Vercel.
+A simplified RSS generator for YouTube Community posts (Formerly known as YouTube Posts), designed to be hosted on Vercel.
+
+> [!NOTE]
+> This RSS feed only captures posts from the channel's author, not from the entire community.
 
 ## Deployment on Vercel
 
